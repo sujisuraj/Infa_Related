@@ -1,21 +1,32 @@
 import csv
-import json
 
+import requests
 from more_itertools import unique_everseen
 
-with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\test.json') as json_file:
-    data = json.load(json_file)
+url = 'https://fdp.slb.com/external/api/fieldtickets/flat'
+payload = {}
+
+headers = {
+    'x-fdpapikey': 'KLiUqw6G72Wu1YT5feWvFTBPl2R3s63kE07XeUqAsXo='
+}
+
+response = requests.request('GET', url, headers=headers, data=payload)
+data = (response.text.encode('utf-8'))
+
+
+# with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\test.json') as json_file:
+#     data = json.load(json_file)
 
 
 def get_links(obj, indices):
     for k, v in obj.items() if isinstance(obj, dict) else enumerate(obj):
-        if isinstance(v, (dict, list)) :
+        if isinstance(v, (dict, list)):
             yield from get_links(v, indices + [k])
         else:
             yield indices + [k]
 
 
-with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\links1.csv', 'w+', newline='') as linksfile:
+with open('links1.csv', 'w+', newline='') as linksfile:
     writer1 = csv.writer(linksfile)
     writer1.writerow(['association', 'fromObjectIdentity', 'toObjectIdentity'])
 
@@ -25,7 +36,7 @@ with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\links1.csv', 'w+
 
         l = len(no_integers)
         # print(l)
-        if (no_integers[0] == 'paginationmetadata' or no_integers[0] == 'links'):
+        if no_integers[0] == 'paginationmetadata' or no_integers[0] == 'links':
             pass
         else:
             while (r < l - 1):
@@ -33,8 +44,8 @@ with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\links1.csv', 'w+
                 writer1.writerow(['com.slb.custom.api.fdp.APIField', no_integers[r], no_integers[r + 1]])
                 r += 1
 
-with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\links1.csv', 'r') as f1, open(
-        'C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\links.csv', 'w+') as f2:
+with open('links1.csv', 'r') as f1, open(
+        'links.csv', 'w+') as f2:
     f2.writelines(unique_everseen(f1))
 
 
@@ -42,7 +53,7 @@ def show_indices(obj, indices):
     for k, v in obj.items() if isinstance(obj, dict) else enumerate(obj):
         if isinstance(v, (dict, list)):
             yield from show_indices(v, indices + [k])
-            if (k == 0):
+            if k == 0:
                 break
         else:
             yield indices + [k]
@@ -67,7 +78,7 @@ for j in t4:
         t3.append(j)
 print(t3)
 
-with open('C:\Suraj\Work_Infa\Projects\India\Schlumberger\Misc\\objects.csv', 'w+', newline='') as objectsfile:
+with open('objects.csv', 'w+', newline='') as objectsfile:
     writer = csv.writer(objectsfile)
     writer.writerow(['class', 'identity', 'core.name', 'core.description', 'com.slb.custom.api.fdp.URL'])
     writer.writerow(['com.slb.custom.api.fdp.System', 'S1', 'FDP', 'FDP API', 'www.google.com'])
